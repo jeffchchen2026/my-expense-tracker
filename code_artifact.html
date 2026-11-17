@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>個人日常消費與分析儀表板</title>
+  <!-- 載入 Tailwind CSS 與 Chart.js 圖表庫 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+  </style>
+  <script>
+    // 快捷填入項目名稱與類別（定義在 global 確保 HTML onclick 絕對能呼叫）
+    window.quickFill = function(itemName, categoryName) {
+      const itemInput = document.getElementById('input-item');
+      const categorySelect = document.getElementById('input-category');
+      if (itemInput) itemInput.value = itemName;
+      if (categorySelect) categorySelect.value = categoryName;
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+  <!-- 頂部資訊列：即時日期、時間與當地天氣 -->
+  <header class="bg-indigo-600 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div class="text-center sm:text-left">
+        <h1 class="text-xl font-bold tracking-wide">💰 個人日常記帳與趨勢分析</h1>
+        <p id="datetime-display" class="text-sm text-indigo-100 mt-1">載入時間中...</p>
+      </div>
+      <div id="weather-display" class="bg-indigo-700/80 px-4 py-2 rounded-xl text-sm flex items-center gap-2 shadow-inner">
+        <span>🌤️ 正在取得當地天氣...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 space-y-6">
+
+    <!-- 預覽模式提示列 -->
+    <div id="demo-banner" class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+      <span>💡 <strong>目前為互動預覽模式（使用範例資料）</strong>：您可以直接試填下方表單體驗圖表即時變化；部署時只需填入您的 Google Apps Script 網址即可正式同步雲端試算表。</span>
+    </div>
+
+    <!-- 新增消費表單區塊 -->
+    <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <h2 class="text-lg font-semibold mb-4 text-slate-700">✍️ 新增消費紀錄</h2>
+      
+      <!-- 常用項目快捷按鈕 -->
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-slate-500 mb-1.5">常用項目快速點選：</label>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="quickFill('早餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🥐 早餐</button>
+          <button type="button" onclick="quickFill('午餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🍱 午餐</button>
+          <button type="button" onclick="quickFill('晚餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🍲 晚餐</button>
+          <button type="button" onclick="quickFill('咖啡', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">☕ 咖啡</button>
+          <button type="button" onclick="quickFill('點心', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🍪 點心</button>
+          <button type="button" onclick="quickFill('捷運/公車', '交通')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🚇 交通通勤</button>
+          <button type="button" onclick="quickFill('私人教練課', '教練課程費')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">💪 教練課程費</button>
+        </div>
+      </div>
+
+      <form id="expense-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">消費日期</label>
+          <input type="date" id="input-date" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">消費類別</label>
+          <select id="input-category" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="飲食">🍱 飲食</option>
+            <option value="交通">🚇 交通</option>
+            <option value="居家生活">🏠 居家生活</option>
+            <option value="娛樂購物">🛍️ 娛樂購物</option>
+            <option value="醫療保健">💊 醫療保健</option>
+            <option value="教練課程費">💪 教練課程費</option>
+            <option value="其他">📦 其他</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">消費方式</label>
+          <select id="input-payment" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+            <option value="現金">💵 現金</option>
+            <option value="信用卡">💳 信用卡</option>
+            <option value="行動支付">📱 行動支付 (LinePay/ApplePay)</option>
+            <option value="悠遊卡/一卡通">🎫 悠遊卡/一卡通</option>
+            <option value="轉帳">🏦 銀行轉帳</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">項目名稱</label>
+          <input type="text" id="input-item" placeholder="例如：午餐便當" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">金額 (TWD)</label>
+          <input type="number" id="input-amount" placeholder="0" min="1" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div class="flex items-end">
+          <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-medium py-2.5 px-4 rounded-xl text-sm transition shadow-sm cursor-pointer">
+            儲存紀錄
+          </button>
+        </div>
+      </form>
+      <div id="status-msg" class="text-xs mt-3 px-3 py-2 rounded-lg hidden"></div>
+    </section>
+
+    <!-- 統計摘要卡片 -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <p class="text-xs font-medium text-slate-500">今日總消費</p>
+        <p id="today-total" class="text-2xl font-bold text-slate-800 mt-1">$0</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <p class="text-xs font-medium text-slate-500">本週總消費 (週一至週日)</p>
+        <p id="week-total" class="text-2xl font-bold text-indigo-600 mt-1">$0</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+        <p class="text-xs font-medium text-slate-500">本月總消費 (當月 1 日起)</p>
+        <p id="month-total" class="text-2xl font-bold text-emerald-600 mt-1">$0</p>
+      </div>
+    </section>
+
+    <!-- 圖表分析區塊 -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- 趨勢圖（支援每週/每月切換） -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2">
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+          <h2 class="text-lg font-semibold text-slate-700">📈 消費趨勢分析</h2>
+          <div class="space-x-1 bg-slate-100 p-1 rounded-xl text-xs">
+            <button type="button" onclick="switchTrend('weekly')" id="btn-weekly" class="px-3 py-1.5 rounded-lg bg-white shadow-sm font-medium text-indigo-600 transition cursor-pointer">每週趨勢</button>
+            <button type="button" onclick="switchTrend('monthly')" id="btn-monthly" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">每月趨勢</button>
+          </div>
+        </div>
+        <div class="relative w-full">
+          <canvas id="trendChart" height="140"></canvas>
+        </div>
+      </div>
+
+      <!-- 類別佔比圓餅圖 -->
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h2 class="text-lg font-semibold text-slate-700 mb-4">🍩 本月類別佔比</h2>
+        <div class="relative w-full">
+          <canvas id="categoryChart" height="220"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- 最近消費明細 -->
+    <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <h2 class="text-lg font-semibold text-slate-700 mb-4">📋 最近 10 筆消費紀錄</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm whitespace-nowrap">
+          <thead class="border-b border-slate-200 text-slate-500">
+            <tr>
+              <th class="py-2.5 pr-4">日期</th>
+              <th class="py-2.5 px-4">類別</th>
+              <th class="py-2.5 px-4">消費方式</th>
+              <th class="py-2.5 px-4">項目</th>
+              <th class="py-2.5 pl-4 text-right">金額</th>
+            </tr>
+          </thead>
+          <tbody id="recent-list" class="divide-y divide-slate-100">
+            <tr><td colspan="5" class="py-4 text-center text-slate-400">正在載入資料...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // 您的正式 Google Apps Script 網頁應用程式網址
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyGcGpV_7-uznRo0c5Sz5XIyPWquQASMTsiGDDNXG0lEHtMTvsQAFtA9EtmL0vt_qgSmw/exec";
+
+    let allRecords = [];
+    let trendChartInstance = null;
+    let categoryChartInstance = null;
+    let currentTrendMode = 'weekly';
+
+    // 顯示自訂訊息提示框
+    function showMessage(text, isError = false) {
+      const msg = document.getElementById('status-msg');
+      if (!msg) return;
+      msg.textContent = text;
+      msg.className = isError
+        ? 'text-xs mt-3 px-3 py-2 rounded-lg bg-rose-50 text-rose-600 border border-rose-200'
+        : 'text-xs mt-3 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200';
+      msg.classList.remove('hidden');
+      setTimeout(() => msg.classList.add('hidden'), 4000);
+    }
+
+    // 產生模擬範例資料供預覽操作
+    function generateSampleData() {
+      const today = new Date();
+      const formatDate = (offsetDays) => {
+        const d = new Date(today.getTime() - offsetDays * 24 * 60 * 60 * 1000);
+        return d.toISOString().split('T')[0];
+      };
+      const prevMonth1 = new Date(today.getFullYear(), today.getMonth() - 1, 15).toISOString().split('T')[0];
+      const prevMonth2 = new Date(today.getFullYear(), today.getMonth() - 2, 12).toISOString().split('T')[0];
+
+      return [
+        { date: prevMonth2, category: "飲食", payment: "信用卡", item: "聚餐火鍋", amount: 1850 },
+        { date: prevMonth2, category: "居家生活", payment: "現金", item: "日用品採買", amount: 3200 },
+        { date: prevMonth1, category: "娛樂購物", payment: "信用卡", item: "線上課程與書籍", amount: 2400 },
+        { date: prevMonth1, category: "交通", payment: "悠遊卡/一卡通", item: "高鐵車票", amount: 1490 },
+        { date: formatDate(6), category: "飲食", payment: "行動支付", item: "晚餐", amount: 680 },
+        { date: formatDate(5), category: "交通", payment: "悠遊卡/一卡通", item: "捷運/公車", amount: 500 },
+        { date: formatDate(4), category: "娛樂購物", payment: "現金", item: "點心與飲料", amount: 250 },
+        { date: formatDate(3), category: "飲食", payment: "行動支付", item: "咖啡", amount: 130 },
+        { date: formatDate(2), category: "醫療保健", payment: "現金", item: "常備維他命", amount: 580 },
+        { date: formatDate(1), category: "飲食", payment: "現金", item: "午餐", amount: 150 },
+        { date: formatDate(0), category: "飲食", payment: "行動支付", item: "早餐", amount: 65 },
+        { date: formatDate(0), category: "飲食", payment: "現金", item: "晚餐", amount: 220 }
+      ];
+    }
+
+    // 1. 即時日期與時刻更新
+    function updateClock() {
+      const now = new Date();
+      const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      const el = document.getElementById('datetime-display');
+      if (el) el.textContent = now.toLocaleString('zh-TW', options);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 預設表單日期為今天
+    const dateInput = document.getElementById('input-date');
+    if (dateInput) dateInput.valueAsDate = new Date();
+
+    // 2. 取得即時天氣
+    function fetchWeather(lat = 25.0330, lon = 121.5654, locationName = "台北市") {
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+        .then(res => res.json())
+        .then(data => {
+          const temp = data.current_weather.temperature;
+          const code = data.current_weather.weathercode;
+          let icon = "☀️ 晴朗";
+          if (code >= 1 && code <= 3) icon = "⛅ 多雲";
+          else if (code >= 45 && code <= 48) icon = "🌫️ 起霧";
+          else if (code >= 51 && code <= 67) icon = "🌧️ 下雨";
+          else if (code >= 80) icon = "⛈️ 雷陣雨";
+          const weatherEl = document.getElementById('weather-display');
+          if (weatherEl) weatherEl.innerHTML = `<span>${locationName} ${icon} <strong>${temp}°C</strong></span>`;
+        })
+        .catch(() => {
+          const weatherEl = document.getElementById('weather-display');
+          if (weatherEl) weatherEl.innerHTML = `<span>台北市 ⛅ 多雲 <strong>24°C</strong></span>`;
+        });
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude, "目前位置"),
+        () => fetchWeather()
+      );
+    } else {
+      fetchWeather();
+    }
+
+    // 3. 讀取消費紀錄
+    async function loadData() {
+      if (!GAS_API_URL || GAS_API_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_URL")) {
+        allRecords = generateSampleData();
+        renderDashboard();
+        return;
+      }
+      
+      try {
+        const response = await fetch(GAS_API_URL);
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          allRecords = data;
+          const banner = document.getElementById('demo-banner');
+          if (banner) banner.classList.add('hidden');
+        } else {
+          allRecords = generateSampleData();
+        }
+        renderDashboard();
+      } catch (err) {
+        console.warn("無法連線至 Google Sheet，改用範例資料預覽:", err);
+        allRecords = generateSampleData();
+        renderDashboard();
+      }
+    }
+
+    // 4. 寫入新消費紀錄（使用 no-cors 與 text/plain 避免 Google Apps Script 重新導向觸發 CORS 錯誤）
+    const expenseForm = document.getElementById('expense-form');
+    if (expenseForm) {
+      expenseForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submit-btn');
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "寫入中...";
+        }
+
+        const payload = {
+          date: document.getElementById('input-date').value,
+          category: document.getElementById('input-category').value,
+          payment: document.getElementById('input-payment').value,
+          item: document.getElementById('input-item').value,
+          amount: Number(document.getElementById('input-amount').value)
+        };
+
+        try {
+          await fetch(GAS_API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify(payload)
+          });
+          
+          showMessage("✅ 已成功發送寫入請求！請稍候重新載入試算表確認。");
+          document.getElementById('input-item').value = "";
+          document.getElementById('input-amount').value = "";
+          
+          setTimeout(async () => {
+            await loadData();
+          }, 1500);
+        } catch (err) {
+          console.error("寫入錯誤:", err);
+          showMessage("❌ 寫入失敗，請檢查網路連線或 Apps Script 權限。", true);
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = "儲存紀錄";
+          }
+        }
+      });
+    }
+
+    // 5. 計算統計數據與繪製圖表（每週以週一至週日為週期；每月以當月1日至最後一日計算）
+    function renderDashboard() {
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      const currentMonthStr = todayStr.slice(0, 7);
+
+      const dayOfWeek = now.getDay();
+      const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday);
+      const sunday = new Date(monday.getTime() + 6 * 24 * 60 * 60 * 1000);
+      const mondayStr = monday.toISOString().split('T')[0];
+      const sundayStr = sunday.toISOString().split('T')[0];
+
+      let todaySum = 0, weekSum = 0, monthSum = 0;
+      const categoryMap = {};
+
+      allRecords.forEach(r => {
+        const d = String(r.date || '').split('T')[0];
+        if (!d) return;
+
+        if (d === todayStr) {
+          todaySum += Number(r.amount) || 0;
+        }
+        if (d >= mondayStr && d <= sundayStr) {
+          weekSum += Number(r.amount) || 0;
+        }
+        if (d.startsWith(currentMonthStr)) {
+          const amt = Number(r.amount) || 0;
+          monthSum += amt;
+          categoryMap[r.category] = (categoryMap[r.category] || 0) + amt;
+        }
+      });
+
+      const todayTotalEl = document.getElementById('today-total');
+      const weekTotalEl = document.getElementById('week-total');
+      const monthTotalEl = document.getElementById('month-total');
+
+      if (todayTotalEl) todayTotalEl.textContent = `$${todaySum.toLocaleString()}`;
+      if (weekTotalEl) weekTotalEl.textContent = `$${weekSum.toLocaleString()}`;
+      if (monthTotalEl) monthTotalEl.textContent = `$${monthSum.toLocaleString()}`;
+
+      const recentHtml = [...allRecords].reverse().slice(0, 10).map(r => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-2.5 pr-4 text-slate-600">${String(r.date || '').split('T')[0]}</td>
+          <td class="py-2.5 px-4"><span class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-md text-xs font-medium">${r.category || '其他'}</span></td>
+          <td class="py-2.5 px-4"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${r.payment || '現金'}</span></td>
+          <td class="py-2.5 px-4 font-medium">${r.item || ''}</td>
+          <td class="py-2.5 pl-4 text-right font-semibold text-slate-800">$${(Number(r.amount) || 0).toLocaleString()}</td>
+        </tr>
+      `).join('');
+      
+      const recentListEl = document.getElementById('recent-list');
+      if (recentListEl) {
+        recentListEl.innerHTML = recentHtml || `<tr><td colspan="5" class="py-4 text-center text-slate-400">尚無消費紀錄</td></tr>`;
+      }
+
+      renderCategoryChart(categoryMap);
+      renderTrendChart();
+    }
+
+    function renderCategoryChart(categoryMap) {
+      const canvas = document.getElementById('categoryChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (categoryChartInstance) categoryChartInstance.destroy();
+      
+      categoryChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(categoryMap),
+          datasets: [{
+            data: Object.values(categoryMap),
+            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#64748b'],
+            borderWidth: 2,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 12 } } }
+          }
+        }
+      });
+    }
+
+    window.switchTrend = function(mode) {
+      currentTrendMode = mode;
+      const btnWeekly = document.getElementById('btn-weekly');
+      const btnMonthly = document.getElementById('btn-monthly');
+
+      if (btnWeekly) {
+        btnWeekly.className = mode === 'weekly'
+          ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-medium text-indigo-600 transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+      }
+      if (btnMonthly) {
+        btnMonthly.className = mode === 'monthly'
+          ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-medium text-indigo-600 transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+      }
+      renderTrendChart();
+    };
+
+    function renderTrendChart() {
+      const canvas = document.getElementById('trendChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (trendChartInstance) trendChartInstance.destroy();
+
+      const grouped = {};
+      allRecords.forEach(r => {
+        const d = String(r.date || '').split('T')[0];
+        if (!d) return;
+        const key = currentTrendMode === 'weekly' ? d : d.slice(0, 7);
+        grouped[key] = (grouped[key] || 0) + (Number(r.amount) || 0);
+      });
+
+      const sortedKeys = Object.keys(grouped).sort().slice(currentTrendMode === 'weekly' ? -14 : -12);
+      const values = sortedKeys.map(k => grouped[k]);
+
+      trendChartInstance = new Chart(ctx, {
+        type: currentTrendMode === 'weekly' ? 'line' : 'bar',
+        data: {
+          labels: sortedKeys,
+          datasets: [{
+            label: currentTrendMode === 'weekly' ? '每日消費金額 (TWD)' : '每月消費總額 (TWD)',
+            data: values,
+            borderColor: '#4f46e5',
+            backgroundColor: currentTrendMode === 'weekly' ? 'rgba(79, 70, 229, 0.15)' : 'rgba(79, 70, 229, 0.75)',
+            borderRadius: 6,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    window.onload = loadData;
+  </script>
+</body>
+</html>
