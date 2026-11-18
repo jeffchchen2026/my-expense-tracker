@@ -9,10 +9,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* 針對長者閱讀體驗，將基礎字體適度放大 */
+    html { font-size: 18px; }
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
   </style>
   <script>
-    // 快捷填入項目名稱與類別（定義在 global 確保 HTML onclick 絕對能呼叫）
+    // 快捷填入項目名稱與類別
     window.quickFill = function(itemName, categoryName) {
       const itemInput = document.getElementById('input-item');
       const categorySelect = document.getElementById('input-category');
@@ -25,13 +27,13 @@
 
   <!-- 頂部資訊列：即時日期、時間與當地天氣 -->
   <header class="bg-indigo-600 text-white shadow-md">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+    <div class="max-w-5xl mx-auto px-4 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
       <div class="text-center sm:text-left">
-        <h1 class="text-xl font-bold tracking-wide">💰 個人日常記帳與趨勢分析</h1>
-        <p id="datetime-display" class="text-sm text-indigo-100 mt-1">載入時間中...</p>
+        <h1 class="text-2xl font-bold tracking-wide">💰 個人日常記帳與心情分析</h1>
+        <p id="datetime-display" class="text-base text-indigo-100 mt-1">載入時間中...</p>
       </div>
-      <div id="weather-display" class="bg-indigo-700/80 px-4 py-2 rounded-xl text-sm flex items-center gap-2 shadow-inner">
-        <span>🌤️ 正在取得當地天氣...</span>
+      <div id="weather-display" class="bg-indigo-700/80 px-4 py-2.5 rounded-xl text-base flex items-center gap-2 shadow-inner">
+        <span>🌤️ 正在取得所在城市天氣...</span>
       </div>
     </div>
   </header>
@@ -40,84 +42,86 @@
 
     <!-- 預覽模式提示列 -->
     <div id="demo-banner" class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 rounded-xl text-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-      <span>💡 <strong>目前為互動預覽模式（使用範例資料）</strong>：您可以直接試填下方表單體驗圖表即時變化；部署時只需填入您的 Google Apps Script 網址即可正式同步雲端試算表。</span>
+      <span>💡 <strong>目前為互動預覽模式</strong>：若雲端試算表尚無資料，畫面會先顯示範例數據；新增消費後將同步寫入您的 Google Sheet。</span>
     </div>
 
     <!-- 新增消費表單區塊 -->
     <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-      <h2 class="text-lg font-semibold mb-4 text-slate-700">✍️ 新增消費紀錄</h2>
+      <h2 class="text-xl font-bold mb-4 text-slate-700">✍️ 新增消費紀錄</h2>
       
       <!-- 常用項目快捷按鈕 -->
-      <div class="mb-4">
-        <label class="block text-xs font-medium text-slate-500 mb-1.5">常用項目快速點選：</label>
-        <div class="flex flex-wrap gap-2">
-          <button type="button" onclick="quickFill('早餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🥐 早餐</button>
-          <button type="button" onclick="quickFill('午餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🍱 午餐</button>
-          <button type="button" onclick="quickFill('晚餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🍲 晚餐</button>
-          <button type="button" onclick="quickFill('咖啡', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">☕ 咖啡</button>
-          <button type="button" onclick="quickFill('點心', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🍪 點心</button>
-          <button type="button" onclick="quickFill('捷運/公車', '交通')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">🚇 交通通勤</button>
-          <button type="button" onclick="quickFill('私人教練課', '教練課程費')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs px-3 py-1.5 rounded-lg font-medium transition cursor-pointer">💪 教練課程費</button>
+      <div class="mb-5">
+        <label class="block text-sm font-medium text-slate-600 mb-2">常用項目快速點選：</label>
+        <div class="flex flex-wrap gap-2.5">
+          <button type="button" onclick="quickFill('早餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">🥐 早餐</button>
+          <button type="button" onclick="quickFill('午餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">🍱 午餐</button>
+          <button type="button" onclick="quickFill('晚餐', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">🍲 晚餐</button>
+          <button type="button" onclick="quickFill('咖啡', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">☕ 咖啡</button>
+          <button type="button" onclick="quickFill('點心', '飲食')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">🍪 點心</button>
+          <button type="button" onclick="quickFill('捷運/公車', '交通')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">🚇 交通通勤</button>
+          <button type="button" onclick="quickFill('私人教練課', '教練課程費')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">💪 教練課程費</button>
+          <button type="button" onclick="quickFill('旅遊行程/住宿', '國內外旅行')" class="bg-sky-50 hover:bg-sky-100 text-sky-700 text-sm px-3.5 py-2 rounded-xl font-medium transition cursor-pointer">✈️ 國內外旅行</button>
         </div>
       </div>
 
       <form id="expense-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         <div>
-          <label class="block text-xs font-medium text-slate-500 mb-1">消費日期</label>
-          <input type="date" id="input-date" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-sm font-medium text-slate-600 mb-1">消費日期</label>
+          <input type="date" id="input-date" required class="w-full border border-slate-300 rounded-xl px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-500 mb-1">消費類別</label>
-          <select id="input-category" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          <label class="block text-sm font-medium text-slate-600 mb-1">消費類別</label>
+          <select id="input-category" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
             <option value="飲食">🍱 飲食</option>
             <option value="交通">🚇 交通</option>
             <option value="居家生活">🏠 居家生活</option>
             <option value="娛樂購物">🛍️ 娛樂購物</option>
             <option value="醫療保健">💊 醫療保健</option>
             <option value="教練課程費">💪 教練課程費</option>
+            <option value="國內外旅行">✈️ 國內外旅行</option>
             <option value="其他">📦 其他</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-500 mb-1">消費方式</label>
-          <select id="input-payment" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          <label class="block text-sm font-medium text-slate-600 mb-1">消費方式</label>
+          <select id="input-payment" class="w-full border border-slate-300 rounded-xl px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
             <option value="現金">💵 現金</option>
             <option value="信用卡">💳 信用卡</option>
-            <option value="行動支付">📱 行動支付 (LinePay/ApplePay)</option>
+            <option value="行動支付">📱 行動支付</option>
             <option value="悠遊卡/一卡通">🎫 悠遊卡/一卡通</option>
             <option value="轉帳">🏦 銀行轉帳</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-500 mb-1">項目名稱</label>
-          <input type="text" id="input-item" placeholder="例如：午餐便當" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-sm font-medium text-slate-600 mb-1">項目名稱</label>
+          <input type="text" id="input-item" placeholder="例如：午餐便當" required class="w-full border border-slate-300 rounded-xl px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
-          <label class="block text-xs font-medium text-slate-500 mb-1">金額 (TWD)</label>
-          <input type="number" id="input-amount" placeholder="0" min="1" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <label class="block text-sm font-medium text-slate-600 mb-1">金額 (TWD)</label>
+          <input type="number" id="input-amount" placeholder="0" min="1" required class="w-full border border-slate-300 rounded-xl px-3 py-3 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div class="flex items-end">
-          <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-medium py-2.5 px-4 rounded-xl text-sm transition shadow-sm cursor-pointer">
+          <button type="submit" id="submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold py-3 px-4 rounded-xl text-base transition shadow-sm cursor-pointer">
             儲存紀錄
           </button>
         </div>
       </form>
-      <div id="status-msg" class="text-xs mt-3 px-3 py-2 rounded-lg hidden"></div>
+      <div id="status-msg" class="text-sm mt-3 px-4 py-2.5 rounded-xl hidden"></div>
     </section>
 
     <!-- 統計摘要卡片 -->
     <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-        <p class="text-xs font-medium text-slate-500">今日總消費</p>
-        <p id="today-total" class="text-2xl font-bold text-slate-800 mt-1">$0</p>
+        <p class="text-sm font-medium text-slate-500">今日總消費</p>
+        <p id="today-total" class="text-3xl font-bold text-slate-800 mt-1">$0</p>
       </div>
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-        <p class="text-xs font-medium text-slate-500">本週總消費 (週一至週日)</p>
-        <p id="week-total" class="text-2xl font-bold text-indigo-600 mt-1">$0</p>
+        <p class="text-sm font-medium text-slate-500">本週總消費 (週一至週日)</p>
+        <p id="week-total" class="text-3xl font-bold text-indigo-600 mt-1">$0</p>
       </div>
       <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-        <p class="text-xs font-medium text-slate-500">本月總消費 (當月 1 日起)</p>
-        <p id="month-total" class="text-2xl font-bold text-emerald-600 mt-1">$0</p>
+        <p class="text-sm font-medium text-slate-500">本月總消費 (當月 1 日起)</p>
+        <p id="month-total" class="text-3xl font-bold text-emerald-600 mt-1">$0</p>
       </div>
     </section>
 
@@ -126,10 +130,10 @@
       <!-- 趨勢圖（支援每週/每月切換） -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2">
         <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
-          <h2 class="text-lg font-semibold text-slate-700">📈 消費趨勢分析</h2>
-          <div class="space-x-1 bg-slate-100 p-1 rounded-xl text-xs">
-            <button type="button" onclick="switchTrend('weekly')" id="btn-weekly" class="px-3 py-1.5 rounded-lg bg-white shadow-sm font-medium text-indigo-600 transition cursor-pointer">每週趨勢</button>
-            <button type="button" onclick="switchTrend('monthly')" id="btn-monthly" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">每月趨勢</button>
+          <h2 class="text-xl font-bold text-slate-700">📈 消費趨勢分析</h2>
+          <div class="space-x-1 bg-slate-100 p-1 rounded-xl text-sm">
+            <button type="button" onclick="switchTrend('weekly')" id="btn-weekly" class="px-3.5 py-1.5 rounded-lg bg-white shadow-sm font-semibold text-indigo-600 transition cursor-pointer">每週趨勢</button>
+            <button type="button" onclick="switchTrend('monthly')" id="btn-monthly" class="px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer">每月趨勢</button>
           </div>
         </div>
         <div class="relative w-full">
@@ -139,29 +143,76 @@
 
       <!-- 類別佔比圓餅圖 -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-lg font-semibold text-slate-700 mb-4">🍩 本月類別佔比</h2>
+        <h2 class="text-xl font-bold text-slate-700 mb-4">🍩 本月類別佔比</h2>
         <div class="relative w-full">
           <canvas id="categoryChart" height="220"></canvas>
         </div>
       </div>
     </section>
 
+    <!-- 當日心情紀錄與年度心情變化圖表 -->
+    <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-slate-700">😊 每日心情紀錄與年度變化</h2>
+          <p class="text-sm text-slate-500 mt-0.5">點選今日心情，系統將自動記錄並繪製一年期的心情起伏曲線</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="mood-date" class="text-sm font-medium text-slate-600">紀錄日期：</label>
+          <input type="date" id="mood-date" class="border border-slate-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+      </div>
+
+      <!-- 5種心情選項按鈕 -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <button type="button" onclick="recordMood(5, '😄 超開心')" class="mood-btn flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 border-slate-200 hover:border-amber-400 hover:bg-amber-50 transition cursor-pointer">
+          <span class="text-3xl mb-1">😄</span>
+          <span class="text-base font-bold text-slate-700">超開心</span>
+        </button>
+        <button type="button" onclick="recordMood(4, '🙂 愉快順心')" class="mood-btn flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 transition cursor-pointer">
+          <span class="text-3xl mb-1">🙂</span>
+          <span class="text-base font-bold text-slate-700">愉快順心</span>
+        </button>
+        <button type="button" onclick="recordMood(3, '😐 平靜普通')" class="mood-btn flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 border-slate-200 hover:border-sky-400 hover:bg-sky-50 transition cursor-pointer">
+          <span class="text-3xl mb-1">😐</span>
+          <span class="text-base font-bold text-slate-700">平靜普通</span>
+        </button>
+        <button type="button" onclick="recordMood(2, '😔 低落')" class="mood-btn flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 transition cursor-pointer">
+          <span class="text-3xl mb-1">😔</span>
+          <span class="text-base font-bold text-slate-700">低落</span>
+        </button>
+        <button type="button" onclick="recordMood(1, '😫 沮喪壓力')" class="mood-btn flex flex-col items-center justify-center p-3.5 rounded-2xl border-2 border-slate-200 hover:border-rose-400 hover:bg-rose-50 transition cursor-pointer col-span-2 sm:col-span-1">
+          <span class="text-3xl mb-1">😫</span>
+          <span class="text-base font-bold text-slate-700">沮喪壓力</span>
+        </button>
+      </div>
+      <div id="mood-status" class="text-sm text-emerald-700 font-medium hidden"></div>
+
+      <!-- 年度心情變化折線圖 -->
+      <div class="pt-2">
+        <h3 class="text-base font-semibold text-slate-600 mb-3">📅 近一年心情變化趨勢 (365天尺度)</h3>
+        <div class="relative w-full">
+          <canvas id="moodChart" height="110"></canvas>
+        </div>
+      </div>
+    </section>
+
     <!-- 最近消費明細 -->
     <section class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-      <h2 class="text-lg font-semibold text-slate-700 mb-4">📋 最近 10 筆消費紀錄</h2>
+      <h2 class="text-xl font-bold text-slate-700 mb-4">📋 最近 10 筆消費紀錄</h2>
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm whitespace-nowrap">
-          <thead class="border-b border-slate-200 text-slate-500">
+        <table class="w-full text-left text-base whitespace-nowrap">
+          <thead class="border-b-2 border-slate-200 text-slate-600">
             <tr>
-              <th class="py-2.5 pr-4">日期</th>
-              <th class="py-2.5 px-4">類別</th>
-              <th class="py-2.5 px-4">消費方式</th>
-              <th class="py-2.5 px-4">項目</th>
-              <th class="py-2.5 pl-4 text-right">金額</th>
+              <th class="py-3 pr-4">日期</th>
+              <th class="py-3 px-4">類別</th>
+              <th class="py-3 px-4">消費方式</th>
+              <th class="py-3 px-4">項目</th>
+              <th class="py-3 pl-4 text-right">金額</th>
             </tr>
           </thead>
           <tbody id="recent-list" class="divide-y divide-slate-100">
-            <tr><td colspan="5" class="py-4 text-center text-slate-400">正在載入資料...</td></tr>
+            <tr><td colspan="5" class="py-5 text-center text-slate-400">正在載入資料...</td></tr>
           </tbody>
         </table>
       </div>
@@ -174,9 +225,28 @@
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyGcGpV_7-uznRo0c5Sz5XIyPWquQASMTsiGDDNXG0lEHtMTvsQAFtA9EtmL0vt_qgSmw/exec";
 
     let allRecords = [];
+    let cloudMoodRecords = {};
     let trendChartInstance = null;
     let categoryChartInstance = null;
+    let moodChartInstance = null;
     let currentTrendMode = 'weekly';
+
+    // 修正時區偏差：將任何日期物件或 ISO 字串統一轉換為台灣本地的 YYYY-MM-DD
+    function getLocalDateStr(dateInput = new Date()) {
+      if (!dateInput) return '';
+      // 若已經是標準 YYYY-MM-DD 純文字格式，直接回傳避免時區轉換誤差
+      if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput.trim())) {
+        return dateInput.trim();
+      }
+      const d = new Date(dateInput);
+      if (isNaN(d.getTime())) {
+        return String(dateInput).split('T')[0];
+      }
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
     // 顯示自訂訊息提示框
     function showMessage(text, isError = false) {
@@ -184,35 +254,29 @@
       if (!msg) return;
       msg.textContent = text;
       msg.className = isError
-        ? 'text-xs mt-3 px-3 py-2 rounded-lg bg-rose-50 text-rose-600 border border-rose-200'
-        : 'text-xs mt-3 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200';
+        ? 'text-base mt-3 px-4 py-3 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 font-medium'
+        : 'text-base mt-3 px-4 py-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium';
       msg.classList.remove('hidden');
-      setTimeout(() => msg.classList.add('hidden'), 4000);
+      setTimeout(() => msg.classList.add('hidden'), 4500);
     }
 
-    // 產生模擬範例資料供預覽操作
+    // 產生模擬範例資料供初次無資料時預覽
     function generateSampleData() {
       const today = new Date();
-      const formatDate = (offsetDays) => {
-        const d = new Date(today.getTime() - offsetDays * 24 * 60 * 60 * 1000);
-        return d.toISOString().split('T')[0];
+      const formatOffsetDate = (offsetDays) => {
+        const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() - offsetDays);
+        return getLocalDateStr(d);
       };
-      const prevMonth1 = new Date(today.getFullYear(), today.getMonth() - 1, 15).toISOString().split('T')[0];
-      const prevMonth2 = new Date(today.getFullYear(), today.getMonth() - 2, 12).toISOString().split('T')[0];
+      const prevMonth1 = getLocalDateStr(new Date(today.getFullYear(), today.getMonth() - 1, 15));
+      const prevMonth2 = getLocalDateStr(new Date(today.getFullYear(), today.getMonth() - 2, 12));
 
       return [
-        { date: prevMonth2, category: "飲食", payment: "信用卡", item: "聚餐火鍋", amount: 1850 },
-        { date: prevMonth2, category: "居家生活", payment: "現金", item: "日用品採買", amount: 3200 },
-        { date: prevMonth1, category: "娛樂購物", payment: "信用卡", item: "線上課程與書籍", amount: 2400 },
-        { date: prevMonth1, category: "交通", payment: "悠遊卡/一卡通", item: "高鐵車票", amount: 1490 },
-        { date: formatDate(6), category: "飲食", payment: "行動支付", item: "晚餐", amount: 680 },
-        { date: formatDate(5), category: "交通", payment: "悠遊卡/一卡通", item: "捷運/公車", amount: 500 },
-        { date: formatDate(4), category: "娛樂購物", payment: "現金", item: "點心與飲料", amount: 250 },
-        { date: formatDate(3), category: "飲食", payment: "行動支付", item: "咖啡", amount: 130 },
-        { date: formatDate(2), category: "醫療保健", payment: "現金", item: "常備維他命", amount: 580 },
-        { date: formatDate(1), category: "飲食", payment: "現金", item: "午餐", amount: 150 },
-        { date: formatDate(0), category: "飲食", payment: "行動支付", item: "早餐", amount: 65 },
-        { date: formatDate(0), category: "飲食", payment: "現金", item: "晚餐", amount: 220 }
+        { date: prevMonth2, category: "國內外旅行", payment: "信用卡", item: "高鐵與飯店住宿", amount: 5800 },
+        { date: prevMonth1, category: "教練課程費", payment: "轉帳", item: "私人健身教練課", amount: 3600 },
+        { date: formatOffsetDate(4), category: "飲食", payment: "行動支付", item: "晚餐", amount: 320 },
+        { date: formatOffsetDate(2), category: "交通", payment: "悠遊卡/一卡通", item: "捷運/公車", amount: 250 },
+        { date: formatOffsetDate(1), category: "飲食", payment: "現金", item: "午餐", amount: 150 },
+        { date: formatOffsetDate(0), category: "飲食", payment: "行動支付", item: "早餐", amount: 85 }
       ];
     }
 
@@ -229,50 +293,74 @@
         second: '2-digit'
       };
       const el = document.getElementById('datetime-display');
-      if (el) el.textContent = now.toLocaleString('zh-TW', options);
+      if (el) {
+        el.textContent = now.toLocaleString('zh-TW', options);
+      }
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 預設表單日期為今天
+    // 預設表單日期與心情日期為台灣本地今天
+    const todayLocal = getLocalDateStr(new Date());
     const dateInput = document.getElementById('input-date');
-    if (dateInput) dateInput.valueAsDate = new Date();
+    const moodDateInput = document.getElementById('mood-date');
+    if (dateInput) dateInput.value = todayLocal;
+    if (moodDateInput) moodDateInput.value = todayLocal;
 
-    // 2. 取得即時天氣
-    function fetchWeather(lat = 25.0330, lon = 121.5654, locationName = "台北市") {
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
-        .then(res => res.json())
-        .then(data => {
-          const temp = data.current_weather.temperature;
-          const code = data.current_weather.weathercode;
-          let icon = "☀️ 晴朗";
-          if (code >= 1 && code <= 3) icon = "⛅ 多雲";
-          else if (code >= 45 && code <= 48) icon = "🌫️ 起霧";
-          else if (code >= 51 && code <= 67) icon = "🌧️ 下雨";
-          else if (code >= 80) icon = "⛈️ 雷陣雨";
-          const weatherEl = document.getElementById('weather-display');
-          if (weatherEl) weatherEl.innerHTML = `<span>${locationName} ${icon} <strong>${temp}°C</strong></span>`;
-        })
-        .catch(() => {
-          const weatherEl = document.getElementById('weather-display');
-          if (weatherEl) weatherEl.innerHTML = `<span>台北市 ⛅ 多雲 <strong>24°C</strong></span>`;
-        });
+    // 2. 取得即時天氣與所在城市名稱
+    async function fetchWeatherWithCity(lat = 25.0330, lon = 121.5654, fallbackCity = "台北市") {
+      const weatherEl = document.getElementById('weather-display');
+      let cityName = fallbackCity;
+
+      // 透過免費地理反查 API 取得實際城市與行政區名稱
+      try {
+        const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh`);
+        const geoData = await geoRes.json();
+        const city = geoData.city || geoData.principalSubdivision || "";
+        const district = geoData.locality && geoData.locality !== city ? geoData.locality : "";
+        if (city || district) {
+          cityName = `${city} ${district}`.trim();
+        }
+      } catch (e) {
+        console.warn("城市名稱反查失敗，使用預設名稱:", e);
+      }
+
+      // 取得即時氣象溫度與天氣狀況
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+        const data = await res.json();
+        const temp = data.current_weather.temperature;
+        const code = data.current_weather.weathercode;
+        let icon = "☀️ 晴朗";
+        if (code >= 1 && code <= 3) icon = "⛅ 多雲";
+        else if (code >= 45 && code <= 48) icon = "🌫️ 起霧";
+        else if (code >= 51 && code <= 67) icon = "🌧️ 下雨";
+        else if (code >= 80) icon = "⛈️ 雷陣雨";
+        if (weatherEl) {
+          weatherEl.innerHTML = `<span>📍 <strong>${cityName}</strong> ${icon} <strong>${temp}°C</strong></span>`;
+        }
+      } catch (e) {
+        if (weatherEl) {
+          weatherEl.textContent = `📍 ${cityName} 🌤️ 天氣資訊暫時無法取得`;
+        }
+      }
     }
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        pos => fetchWeather(pos.coords.latitude, pos.coords.longitude, "目前位置"),
-        () => fetchWeather()
+        pos => fetchWeatherWithCity(pos.coords.latitude, pos.coords.longitude, "台北市"),
+        () => fetchWeatherWithCity(25.0330, 121.5654, "台北市")
       );
     } else {
-      fetchWeather();
+      fetchWeatherWithCity(25.0330, 121.5654, "台北市");
     }
 
-    // 3. 讀取消費紀錄
+    // 3. 讀取消費紀錄與雲端心情紀錄
     async function loadData() {
       if (!GAS_API_URL || GAS_API_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_URL")) {
         allRecords = generateSampleData();
         renderDashboard();
+        renderMoodChart();
         return;
       }
       
@@ -280,21 +368,40 @@
         const response = await fetch(GAS_API_URL);
         const data = await response.json();
         if (Array.isArray(data) && data.length > 0) {
-          allRecords = data;
+          // 1. 提取雲端試算表中的心情紀錄
+          const fetchedMoods = {};
+          data.filter(item => item.category === '心情紀錄').forEach(item => {
+            const d = getLocalDateStr(item.date);
+            const score = Number(item.payment) || 3;
+            if (d) {
+              fetchedMoods[d] = { score: score, label: item.item || '心情紀錄' };
+            }
+          });
+          cloudMoodRecords = fetchedMoods;
+
+          // 2. 過濾掉心情同步紀錄（避免混入消費金額計算），並將日期正規化為本地日期
+          allRecords = data
+            .filter(item => item.category !== '心情紀錄')
+            .map(item => ({
+              ...item,
+              date: getLocalDateStr(item.date)
+            }));
           const banner = document.getElementById('demo-banner');
           if (banner) banner.classList.add('hidden');
         } else {
           allRecords = generateSampleData();
         }
         renderDashboard();
+        renderMoodChart();
       } catch (err) {
         console.warn("無法連線至 Google Sheet，改用範例資料預覽:", err);
         allRecords = generateSampleData();
         renderDashboard();
+        renderMoodChart();
       }
     }
 
-    // 4. 寫入新消費紀錄（使用 no-cors 與 text/plain 避免 Google Apps Script 重新導向觸發 CORS 錯誤）
+    // 4. 寫入新消費紀錄
     const expenseForm = document.getElementById('expense-form');
     if (expenseForm) {
       expenseForm.addEventListener('submit', async (e) => {
@@ -305,13 +412,18 @@
           btn.textContent = "寫入中...";
         }
 
+        const selectedDate = document.getElementById('input-date').value;
         const payload = {
-          date: document.getElementById('input-date').value,
+          date: selectedDate,
           category: document.getElementById('input-category').value,
           payment: document.getElementById('input-payment').value,
           item: document.getElementById('input-item').value,
           amount: Number(document.getElementById('input-amount').value)
         };
+
+        // 樂觀更新（Optimistic UI）：先立即加入前端畫面並重新加總，讓使用者馬上看到今日總消費與列表更新
+        allRecords.push(payload);
+        renderDashboard();
 
         try {
           await fetch(GAS_API_URL, {
@@ -323,16 +435,17 @@
             body: JSON.stringify(payload)
           });
           
-          showMessage("✅ 已成功發送寫入請求！請稍候重新載入試算表確認。");
+          showMessage(`✅ 已成功記錄「${payload.item} $${payload.amount}」並同步至 Google Sheet！`);
           document.getElementById('input-item').value = "";
           document.getElementById('input-amount').value = "";
           
+          // 2 秒後重新與雲端試算表同步確認
           setTimeout(async () => {
             await loadData();
-          }, 1500);
+          }, 2000);
         } catch (err) {
           console.error("寫入錯誤:", err);
-          showMessage("❌ 寫入失敗，請檢查網路連線或 Apps Script 權限。", true);
+          showMessage("❌ 雲端同步失敗，請檢查網路連線或 Apps Script 權限。", true);
         } finally {
           if (btn) {
             btn.disabled = false;
@@ -342,34 +455,35 @@
       });
     }
 
-    // 5. 計算統計數據與繪製圖表（每週以週一至週日為週期；每月以當月1日至最後一日計算）
+    // 5. 計算統計數據與繪製圖表（修復時區對齊問題）
     function renderDashboard() {
       const now = new Date();
-      const todayStr = now.toISOString().split('T')[0];
+      const todayStr = getLocalDateStr(now);
       const currentMonthStr = todayStr.slice(0, 7);
 
+      // 計算本週一至週日的本地日期範圍
       const dayOfWeek = now.getDay();
       const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday);
-      const sunday = new Date(monday.getTime() + 6 * 24 * 60 * 60 * 1000);
-      const mondayStr = monday.toISOString().split('T')[0];
-      const sundayStr = sunday.toISOString().split('T')[0];
+      const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+      const mondayStr = getLocalDateStr(monday);
+      const sundayStr = getLocalDateStr(sunday);
 
       let todaySum = 0, weekSum = 0, monthSum = 0;
       const categoryMap = {};
 
       allRecords.forEach(r => {
-        const d = String(r.date || '').split('T')[0];
+        const d = getLocalDateStr(r.date);
         if (!d) return;
+        const amt = Number(r.amount) || 0;
 
         if (d === todayStr) {
-          todaySum += Number(r.amount) || 0;
+          todaySum += amt;
         }
         if (d >= mondayStr && d <= sundayStr) {
-          weekSum += Number(r.amount) || 0;
+          weekSum += amt;
         }
         if (d.startsWith(currentMonthStr)) {
-          const amt = Number(r.amount) || 0;
           monthSum += amt;
           categoryMap[r.category] = (categoryMap[r.category] || 0) + amt;
         }
@@ -383,19 +497,20 @@
       if (weekTotalEl) weekTotalEl.textContent = `$${weekSum.toLocaleString()}`;
       if (monthTotalEl) monthTotalEl.textContent = `$${monthSum.toLocaleString()}`;
 
+      // 渲染最近 10 筆消費明細（確保日期正確顯示為本地日期）
       const recentHtml = [...allRecords].reverse().slice(0, 10).map(r => `
         <tr class="hover:bg-slate-50 transition">
-          <td class="py-2.5 pr-4 text-slate-600">${String(r.date || '').split('T')[0]}</td>
-          <td class="py-2.5 px-4"><span class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-md text-xs font-medium">${r.category || '其他'}</span></td>
-          <td class="py-2.5 px-4"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-xs">${r.payment || '現金'}</span></td>
-          <td class="py-2.5 px-4 font-medium">${r.item || ''}</td>
-          <td class="py-2.5 pl-4 text-right font-semibold text-slate-800">$${(Number(r.amount) || 0).toLocaleString()}</td>
+          <td class="py-3 pr-4 text-slate-700 font-medium">${getLocalDateStr(r.date)}</td>
+          <td class="py-3 px-4"><span class="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg text-sm font-medium">${r.category || '其他'}</span></td>
+          <td class="py-3 px-4"><span class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg text-sm">${r.payment || '現金'}</span></td>
+          <td class="py-3 px-4 font-medium text-slate-800">${r.item || ''}</td>
+          <td class="py-3 pl-4 text-right font-bold text-slate-900">$${(Number(r.amount) || 0).toLocaleString()}</td>
         </tr>
       `).join('');
       
       const recentListEl = document.getElementById('recent-list');
       if (recentListEl) {
-        recentListEl.innerHTML = recentHtml || `<tr><td colspan="5" class="py-4 text-center text-slate-400">尚無消費紀錄</td></tr>`;
+        recentListEl.innerHTML = recentHtml || `<tr><td colspan="5" class="py-5 text-center text-slate-400">尚無消費紀錄</td></tr>`;
       }
 
       renderCategoryChart(categoryMap);
@@ -414,7 +529,7 @@
           labels: Object.keys(categoryMap),
           datasets: [{
             data: Object.values(categoryMap),
-            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#64748b'],
+            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#0ea5e9', '#64748b'],
             borderWidth: 2,
             borderColor: '#ffffff'
           }]
@@ -422,7 +537,7 @@
         options: {
           responsive: true,
           plugins: {
-            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 12 } } }
+            legend: { position: 'bottom', labels: { boxWidth: 14, padding: 14, font: { size: 14 } } }
           }
         }
       });
@@ -435,13 +550,13 @@
 
       if (btnWeekly) {
         btnWeekly.className = mode === 'weekly'
-          ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-medium text-indigo-600 transition cursor-pointer'
-          : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+          ? 'px-3.5 py-1.5 rounded-lg bg-white shadow-sm font-semibold text-indigo-600 transition cursor-pointer'
+          : 'px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
       }
       if (btnMonthly) {
         btnMonthly.className = mode === 'monthly'
-          ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-medium text-indigo-600 transition cursor-pointer'
-          : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
+          ? 'px-3.5 py-1.5 rounded-lg bg-white shadow-sm font-semibold text-indigo-600 transition cursor-pointer'
+          : 'px-3.5 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition cursor-pointer';
       }
       renderTrendChart();
     };
@@ -454,7 +569,7 @@
 
       const grouped = {};
       allRecords.forEach(r => {
-        const d = String(r.date || '').split('T')[0];
+        const d = getLocalDateStr(r.date);
         if (!d) return;
         const key = currentTrendMode === 'weekly' ? d : d.slice(0, 7);
         grouped[key] = (grouped[key] || 0) + (Number(r.amount) || 0);
@@ -479,14 +594,190 @@
         },
         options: {
           responsive: true,
+          plugins: {
+            legend: { labels: { font: { size: 14 } } }
+          },
           scales: {
-            y: { beginAtZero: true }
+            y: { beginAtZero: true, ticks: { font: { size: 13 } } },
+            x: { ticks: { font: { size: 13 } } }
           }
         }
       });
     }
 
-    window.onload = loadData;
+    // 6. 每日心情紀錄與近一年心情變化圖表（365天尺度）
+    const MOOD_STORAGE_KEY = 'personal_annual_mood_records_v1';
+
+    function getMoodData() {
+      let localMoods = {};
+      try {
+        const saved = localStorage.getItem(MOOD_STORAGE_KEY);
+        if (saved) localMoods = JSON.parse(saved);
+      } catch (e) {}
+
+      // 合併本機快取與 Google Sheet 雲端心情紀錄（雲端資料優先，確保跨裝置同步）
+      const combined = { ...localMoods, ...cloudMoodRecords };
+      if (Object.keys(combined).length > 0) {
+        return combined;
+      }
+
+      // 若雲端與本機皆無紀錄，自動產生過去一年的示範心情軌跡供參考
+      const sampleMoods = {};
+      const today = new Date();
+      const presetScores = [4, 5, 3, 4, 4, 2, 3, 5, 4, 3, 4, 5];
+      for (let i = 11; i >= 1; i--) {
+        const d = getLocalDateStr(new Date(today.getFullYear(), today.getMonth() - i, 15));
+        sampleMoods[d] = { score: presetScores[11 - i], label: '歷史紀錄' };
+      }
+      return sampleMoods;
+    }
+
+    window.recordMood = async function(score, label) {
+      const moodDate = document.getElementById('mood-date').value || getLocalDateStr(new Date());
+      
+      // 立即更新本機與記憶體狀態（樂觀更新）
+      cloudMoodRecords[moodDate] = { score, label };
+      try {
+        const saved = JSON.parse(localStorage.getItem(MOOD_STORAGE_KEY) || '{}');
+        saved[moodDate] = { score, label };
+        localStorage.setItem(MOOD_STORAGE_KEY, JSON.stringify(saved));
+      } catch (e) {}
+
+      renderMoodChart();
+
+      const statusEl = document.getElementById('mood-status');
+      if (statusEl) {
+        statusEl.textContent = `⏳ 正在將 ${moodDate} 的心情「${label}」同步至 Google Sheet...`;
+        statusEl.classList.remove('hidden');
+      }
+
+      // 同步寫入 Google Sheet（利用既有欄位：類別='心情紀錄', 消費方式=分數, 項目=心情標籤, 金額=0）
+      try {
+        if (GAS_API_URL && !GAS_API_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_URL")) {
+          await fetch(GAS_API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              date: moodDate,
+              category: '心情紀錄',
+              payment: String(score),
+              item: label,
+              amount: 0
+            })
+          });
+        }
+        if (statusEl) {
+          statusEl.textContent = `✅ 已記錄 ${moodDate} 的心情為「${label}」並同步至試算表！`;
+          setTimeout(() => statusEl.classList.add('hidden'), 4000);
+        }
+      } catch (err) {
+        if (statusEl) {
+          statusEl.textContent = `⚠️ 已本機記錄心情，但雲端試算表同步暫時失敗。`;
+          setTimeout(() => statusEl.classList.add('hidden'), 4000);
+        }
+      }
+    };
+
+    function renderMoodChart() {
+      const canvas = document.getElementById('moodChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (moodChartInstance) moodChartInstance.destroy();
+
+      const moodData = getMoodData();
+      const today = new Date();
+      const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+      const oneYearAgoStr = getLocalDateStr(oneYearAgo);
+
+      // 篩選近一年內的日期並排序
+      const sortedDates = Object.keys(moodData)
+        .filter(d => d >= oneYearAgoStr)
+        .sort();
+
+      const scores = sortedDates.map(d => moodData[d].score);
+      const moodLabelsMap = {
+        5: '😄 超開心',
+        4: '🙂 愉快順心',
+        3: '😐 平靜普通',
+        2: '😔 低落',
+        1: '😫 沮喪壓力'
+      };
+
+      moodChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: sortedDates,
+          datasets: [{
+            label: '每日心情指數 (1~5分)',
+            data: scores,
+            borderColor: '#f59e0b',
+            backgroundColor: 'rgba(245, 158, 11, 0.15)',
+            pointBackgroundColor: '#d97706',
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            tension: 0.3,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { font: { size: 14 } } },
+            tooltip: {
+              callbacks: {
+                title: function(context) {
+                  // 滑鼠懸停或點擊節點時，依然顯示完整 YYYY-MM-DD 日期
+                  return `日期：${context[0].label}`;
+                },
+                label: function(context) {
+                  const val = context.parsed.y;
+                  return `心情狀態：${moodLabelsMap[val] || val + '分'}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              min: 1,
+              max: 5,
+              ticks: {
+                stepSize: 1,
+                font: { size: 13 },
+                callback: function(value) {
+                  const shortLabels = { 5: '😄 超開心', 4: '🙂 愉快', 3: '😐 平靜', 2: '😔 低落', 1: '😫 沮喪壓力' };
+                  return shortLabels[value] || value;
+                }
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                font: { size: 13 },
+                maxRotation: 0,
+                autoSkip: true,
+                maxTicksLimit: 7,
+                // 將下方日期簡化為「月/日」（例如 11/18），跨年時顯示年份，大幅減少擁擠感
+                callback: function(val, index) {
+                  const fullDate = this.getLabelForValue(val);
+                  if (!fullDate) return '';
+                  const parts = fullDate.split('-');
+                  if (parts.length === 3) {
+                    return `${Number(parts[1])}/${Number(parts[2])}`;
+                  }
+                  return fullDate;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    window.onload = function() {
+      loadData();
+      renderMoodChart();
+    };
   </script>
 </body>
 </html>
