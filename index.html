@@ -379,7 +379,7 @@
           });
           cloudMoodRecords = fetchedMoods;
 
-          // 2. 過濾掉心情同步紀錄（避免混入消費金額計算），並將日期正規化為本地日期
+          // 2. 嚴格過濾掉心情紀錄（category === '心情紀錄'），確保消費清單只顯示一般消費
           allRecords = data
             .filter(item => item.category !== '心情紀錄')
             .map(item => ({
